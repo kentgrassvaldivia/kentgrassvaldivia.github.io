@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iNaturalist | Kent Grass-Valdivia</title>
+  <meta name="description" content="Recent fungi, slime mold, lichen, and nature observations from Kent Grass-Valdivia's iNaturalist account." />
+  <link rel="canonical" href="https://kentgrassvaldivia.github.io/inaturalist.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Kent Grass-Valdivia" />
+  <meta property="og:title" content="iNaturalist | Kent Grass-Valdivia" />
+  <meta property="og:description" content="Recent iNaturalist observations from Kent Grass-Valdivia." />
+  <meta property="og:url" content="https://kentgrassvaldivia.github.io/inaturalist.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="iNaturalist | Kent Grass-Valdivia" />
+  <meta name="twitter:description" content="Recent iNaturalist observations from Kent Grass-Valdivia." />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .intro {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .status {
+      margin-bottom: 1rem;
+      color: #1e3a56;
+      font-weight: 600;
+    }
+
+    .observations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .observation-card {
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .observation-card img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+      background: #e9eef2;
+    }
+
+    .observation-content {
+      padding: 0.9rem;
+    }
+
+    .observation-content h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .observation-content p {
+      margin: 0.2rem 0;
+      font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>iNaturalist</h1>
+  </header>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <a href="index.html">Home</a>
+    <a href="research.html">Research</a>
+    <a href="professional.html">Professional</a>
+    <a href="inaturalist.html">iNaturalist</a>
+    <a href="travel-map.html">Travel</a>
+  </nav>
+
+  <main>
+    <section class="intro">
+      <p>I post most of my fungi, slime mold, lichen, and other nature finds on my <a href="https://www.inaturalist.org/observations?user_id=kent_grass_valdivia" target="_blank" rel="noopener noreferrer">iNaturalist account</a>.</p>
+    </section>
+
+    <p id="status" class="status">Loading recent observations...</p>
+    <section id="observations" class="observations" aria-live="polite"></section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Kent Grass-Valdivia. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const username = "kent_grass_valdivia";
+    const endpoint = `https://api.inaturalist.org/v1/observations?user_login=${username}&per_page=24&order=desc&order_by=observed_on`;
+
+    const observationsContainer = document.getElementById("observations");
+    const statusEl = document.getElementById("status");
+
+    function formatDate(value) {
+      if (!value) return "Unknown date";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Unknown date";
+      return date.toLocaleDateString();
+    }
+
+    function buildCard(observation) {
+      const card = document.createElement("article");
+      card.className = "observation-card";
+
+      const photoUrl = observation.photos && observation.photos.length > 0
+        ? observation.photos[0].url.replace("square", "medium")
+        : "";
+
+      const species = observation.taxon
+        ? observation.taxon.preferred_common_name || observation.taxon.name
+        : "Unidentified observation";
+
+      const location = observation.place_guess || "Location not specified";
+      const observedOn = formatDate(observation.observed_on_string || observation.observed_on);
+
+      card.innerHTML = `
+        ${photoUrl ? `<img src="${photoUrl}" alt="${species}">` : "<img alt=\"No photo\">"}
+        <div class="observation-content">
+          <h3>${species}</h3>
+          <p><strong>Date:</strong> ${observedOn}</p>
+          <p><strong>Place:</strong> ${location}</p>
+          <p><a href="https://www.inaturalist.org/observations/${observation.id}" target="_blank" rel="noopener noreferrer">View observation</a></p>
+        </div>
+      `;
+
+      return card;
+    }
+
+    async function loadObservations() {
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error("Failed to load observations");
+
+        const data = await response.json();
+        const results = data.results || [];
+
+        observationsContainer.innerHTML = "";
+
+        if (results.length === 0) {
+          statusEl.textContent = "No observations found yet.";
+          return;
+        }
+
+        results.forEach((observation) => {
+          observationsContainer.appendChild(buildCard(observation));
+        });
+
+        statusEl.textContent = `Showing ${results.length} most recent observations.`;
+      } catch (error) {
+        statusEl.textContent = "Could not load iNaturalist data right now. Please try again later.";
+      }
+    }
+
+    loadObservations();
+  </script>
+</body>
+</html>
