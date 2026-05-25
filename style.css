@@ -42,15 +42,30 @@ body {
   
   /* Profile Section */
   #about {
-    padding: 2rem;
-    text-align: center;
-    background-color: white;
+      padding: 2rem;
+      text-align: left;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
   }
+
+    .about-copy {
+      max-width: 680px;
+    }
+
+    .about-copy h2 {
+      margin-top: 0;
+    }
   
   .profile-pic {
     width: 150px;
     border-radius: 50%;
-    margin-bottom: 1rem;
+    margin: 0;
+    flex: 0 0 auto;
   }
   
   /* Projects Section */
@@ -94,6 +109,11 @@ body {
   
   /* Responsive Design */
   @media (max-width: 600px) {
+    #about {
+      gap: 1rem;
+      padding: 1.25rem;
+    }
+
     .profile-pic {
       width: 100px;
     }
