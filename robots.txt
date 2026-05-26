@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://kentgrassvaldivia.github.io/sitemap.xml
+Sitemap: https://kentgrassvaldivia.github.io/sitemap-main.xml
